@@ -1,0 +1,21 @@
+spring:
+  main:
+    banner-mode: off
+  application:
+    name: faq-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/knowledge-base
+    username: postgres
+    password: postgres
+  flyway:
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+  security:
+    jwt:
+      secret-key: k8s9f7j2m5p3q6r1t4v7x9z0b2d4g6h8j0l2n4p6r8t1v3x5z7y9w5u3a1c8e0g2i4
+      access-expiration: 600
+      refresh-expiration: 86400
+
+logging:
+  config: classpath:local-logback-spring.xml
