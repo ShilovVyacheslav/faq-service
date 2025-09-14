@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: faq-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/knowledge-base
+    username: postgres
+    password: postgres
+  flyway:
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
