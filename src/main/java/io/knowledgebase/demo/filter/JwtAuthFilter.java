@@ -26,7 +26,7 @@ import java.util.Optional;
 @Log4j2
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final SecurityUserService securityUserService;
