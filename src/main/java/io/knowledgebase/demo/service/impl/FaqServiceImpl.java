@@ -2,6 +2,7 @@ package io.knowledgebase.demo.service.impl;
 
 import io.knowledgebase.demo.common.validation.SortValidator;
 import io.knowledgebase.demo.dto.faq.FaqCreateDto;
+import io.knowledgebase.demo.dto.faq.FaqPreviewDto;
 import io.knowledgebase.demo.dto.faq.FaqResponseDto;
 import io.knowledgebase.demo.dto.faq.FaqUpdateDto;
 import io.knowledgebase.demo.entity.Faq;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,50 +55,36 @@ public class FaqServiceImpl implements FaqService {
     @Override
     @Transactional
     public FaqResponseDto updateFaq(Long id, FaqUpdateDto faqUpdateDto) {
-        log.info("Updating FAQ: id={}, newQuestion='{}', newShowInTg={}",
-                id, faqUpdateDto.getQuestion(), faqUpdateDto.getShowInTg());
-        User updatedBy = userService.getUserByJwt();
         Faq existingFaq = getFaqById(id);
 
-        faqMapper.updateFromDto(faqUpdateDto, existingFaq, updatedBy);
+        faqMapper.updateFromDto(faqUpdateDto, existingFaq);
         faqDocService.updateFaqDoc(faqUpdateDto, id);
 
-        if (shouldDeactivateLinks(existingFaq.getActive())) {
-            categoryFaqRepository.deactivateAllLinksByFaqId(id);
-        }
         return faqMapper.toResponseDto(existingFaq);
     }
 
     @Override
     public void deleteFaq(Long id) {
         if (!faqRepository.existsById(id)) {
-            throw new FaqNotFoundException(id);
+            throw FaqException.faqNotFound(id);
         }
         faqRepository.deleteById(id);
         faqDocService.deleteFaqDoc(id);
     }
 
     @Override
-    public Page<FaqShortResponseDto> getAllFaqs(Pageable pageable) {
+    public Page<FaqResponseDto> readAllFaqs(Pageable pageable) {
         sortValidator.validate(pageable, ALLOWED_SORT_FIELDS);
-        Specification<Faq> spec = FaqSpecification.byId(filter.getId());
         Pageable sorted = ensureDefaultSort(pageable);
 
-        return faqRepository.findAll(spec, sorted)
-                .map(faqMapper::toShortDto);
+        return faqRepository.findAll(sorted).map(faqMapper::toResponseDto);
     }
 
     @Override
     @Transactional
-    public FaqDetailedResponseDto getFaqDetailsById(Long id) {
+    public FaqResponseDto readFaqById(Long id) {
         Faq faq = getFaqById(id);
-        faqRepository.incrementViewCounter(id);
-
-        List<String> categoryNames = categoryFaqRepository.findByFaqIdAndActiveTrue(id)
-                .stream()
-                .map(link -> link.getCategory().getName())
-                .toList();
-        return faqMapper.toDetailedDto(faq, categoryNames);
+        return faqMapper.toResponseDto(faq);
     }
 
     @Override
@@ -147,9 +133,5 @@ public class FaqServiceImpl implements FaqService {
         if (faq != null) {
             throw FaqException.faqAlreadyExists(faq.getQuestion(), faq.getAnswer());
         }
-    }
-
-    private boolean shouldDeactivateLinks(Boolean isActive) {
-        return isActive != null && !isActive;
     }
 }

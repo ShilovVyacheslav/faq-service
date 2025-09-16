@@ -29,7 +29,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/faq")
-public class FaqAdminController {
+public class FaqController {
 
     private final FaqService faqService;
 

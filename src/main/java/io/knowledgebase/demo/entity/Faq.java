@@ -25,7 +25,7 @@ import java.util.List;
 @Setter
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "faqs")
+@Table(name = "faq")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Faq {
