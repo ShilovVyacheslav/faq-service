@@ -2,7 +2,7 @@ package io.knowledgebase.demo.config;
 
 import io.jsonwebtoken.security.Keys;
 import io.knowledgebase.demo.config.props.JwtProps;
-import io.knowledgebase.demo.filter.JwtAuthenticationFilter;
+import io.knowledgebase.demo.filter.JwtAuthFilter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -47,15 +47,13 @@ public class SecurityConfig {
             "/swagger-resources/**",
             "/v3/api-docs/**",
             "/actuator/**",
-            "/test/**",
-            "/api/v1/faq/**",
             "/api/v1/auth/login"
     };
 
     JwtProps jwtProps;
 
     private final UserDetailsService userDetailsService;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
@@ -72,7 +70,7 @@ public class SecurityConfig {
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

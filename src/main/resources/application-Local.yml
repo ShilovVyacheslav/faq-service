@@ -16,6 +16,29 @@ spring:
       secret-key: k8s9f7j2m5p3q6r1t4v7x9z0b2d4g6h8j0l2n4p6r8t1v3x5z7y9w5u3a1c8e0g2i4
       access-expiration: 600
       refresh-expiration: 86400
+  cache:
+    type: redis
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: faq-service
+      username: "faq_user"
+      password: "faq_password"
+    redis:
+      enabled: true
+      host: localhost
+      port: 6379
+      password:
+      flush-on-startup: true
 
 logging:
   config: classpath:local-logback-spring.xml
+
+scheduler:
+  defaultLockAtMostFor: "3m"
+  faq-sync:
+    cron: "0 */1 * * * *"
+    enabled: true
+    lockAtLeastFor: "1m"
+    lockAtMostFor: "2m"

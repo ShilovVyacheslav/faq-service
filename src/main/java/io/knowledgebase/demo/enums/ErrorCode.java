@@ -16,6 +16,8 @@ public enum ErrorCode {
     USER_NOT_FOUND_BY_USERNAME_ERROR("User not found with username: %s", 404),
 
     FAQ_INVALID_SORT_FIELD("Sorting by field '%s' is not allowed", 400),
+    FAQ_NOT_FOUND("FAQ not found with id: %s", 404),
+    FAQ_ALREADY_EXISTS("FAQ with question '%s' and answer '%s' already exists", 409),
     FAQ_DOC_NOT_FOUND_BY_ID_ERROR("FaqDoc not found with id: %s", 404),
     FAQ_DOES_NOT_EXIST_IN_POSTGRE_SQL("FAQ with id %s doesn't exist in PostgreSQL", 404);
 
