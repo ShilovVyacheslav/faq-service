@@ -6,8 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum Role {
     USER,
     EXPERT,
-    ADMIN,
-    AGENT;
+    ADMIN;
 
     @Override
     public String toString() {
