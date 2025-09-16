@@ -49,7 +49,7 @@ class JwtServiceTest {
     private static final String TEST_USERNAME = "test_user";
     private static final Long TEST_USER_ID = 1L;
     private static final Role TEST_ROLE = Role.ADMIN;
-    private static final String SECRET_KEY = "uG4PzXwR7VjQ3LkH0bTnE8cYfM2aS9dZpW5rU1xO6hNqC7vJtB4yF3mK8gD2lP0oA";
+    private static final String SECRET_KEY = "uG4PzXwR7VjQ3LkH0bTnE8cYfM2aS9dZpW5rU1xO6hNqC7vJtB4yF3mK8gD2lP0oA"; // pragma: allowlist secret
     private static final long EXPIRATION_TIME = 3600000L;
     private static final String PATTERN = "^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$";
 
