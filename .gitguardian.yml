@@ -2,4 +2,4 @@ paths:
   ignore:
     - "src/main/resources/application-Local.yml"
     - "src/test/resources/application-Test.yml"
-    - "src/test/java/io/knowledgebase/demo/service/jwt/JwtServiceTest.java"
+    - src/test/java/io/knowledgebase/demo/service/jwt/JwtServiceTest.java
