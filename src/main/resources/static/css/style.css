@@ -50,6 +50,9 @@ body {
     padding: 30px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 640px;
 }
 
 .search-column:hover {
@@ -96,6 +99,7 @@ body {
 .search-input-container {
     position: relative;
     margin-bottom: 25px;
+    flex-shrink: 0;
 }
 
 .search-input {
@@ -126,6 +130,26 @@ body {
 .results-container {
     max-height: 500px;
     overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 5px;
+}
+
+.results-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.results-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.results-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
+}
+
+.results-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
 }
 
 .result-item {
@@ -135,6 +159,8 @@ body {
     margin-bottom: 15px;
     border-left: 4px solid #667eea;
     transition: all 0.3s ease;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .result-item:hover {
@@ -149,12 +175,15 @@ body {
     color: #333;
     margin-bottom: 10px;
     line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .keywords-container {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    max-width: 100%;
 }
 
 .keyword {
