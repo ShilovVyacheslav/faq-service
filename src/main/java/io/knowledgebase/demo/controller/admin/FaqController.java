@@ -71,13 +71,13 @@ public class FaqController {
         return ResponseEntity.ok(faqResponseDto);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'EXPERT', 'USER')")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'EXPERT', 'USER')")
     @GetMapping("/pg-search")
     public ResponseEntity<List<FaqResponseDto>> searchFaqByKeyWord(@RequestParam(name = "key") String key) {
         return ResponseEntity.ok(faqService.searchFaqByKeyWord(key));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'EXPERT', 'USER')")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'EXPERT', 'USER')")
     @GetMapping("/search")
     public ResponseEntity<List<FaqPreviewDto>> searchFaqDocs(@RequestParam(name = "query") String query) {
         return ResponseEntity.ok(faqService.searchFaqDocs(query));

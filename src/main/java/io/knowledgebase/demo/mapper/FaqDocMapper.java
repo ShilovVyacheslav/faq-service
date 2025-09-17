@@ -21,6 +21,7 @@ public interface FaqDocMapper {
     @Mapping(target = "id", ignore = true)
     FaqDoc toEntity(FaqCreateDto faqCreateDto);
 
+    @Mapping(target = "keywords", source = "keywords")
     FaqPreviewDto toResponseDto(FaqDoc faqDoc);
 
     @Mapping(target = "id", ignore = true)

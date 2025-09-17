@@ -4,7 +4,4 @@ public enum ErrorType {
     EXTERNAL_ERROR,
     VALIDATION_ERROR,
     INTERNAL_ERROR;
-
-    private ErrorType() {
-    }
 }

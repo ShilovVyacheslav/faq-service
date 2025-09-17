@@ -47,7 +47,12 @@ public class SecurityConfig {
             "/swagger-resources/**",
             "/v3/api-docs/**",
             "/actuator/**",
-            "/api/v1/auth/login"
+            "/css/**",
+            "/js/**",
+            "/api/v1/auth/login",
+            "/search.html",
+            "/admin/faq/search", // TODO: delete from white list
+            "/admin/faq/pg-search",
     };
 
     JwtProps jwtProps;
