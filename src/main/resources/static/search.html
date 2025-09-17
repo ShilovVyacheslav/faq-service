@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KnowledgeBase Pro - Премиум поиск</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>FAQ-service</h1>
+        <p>A powerful knowledge base search system with intelligent algorithms</p>
+    </div>
+
+    <div class="search-grid">
+        <!-- MongoDB Search -->
+        <div class="search-column">
+            <div class="search-header">
+                <div class="search-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div>
+                    <div class="search-title">MongoDB Search</div>
+                    <div class="search-subtitle">Fast search based on trie and caching</div>
+                </div>
+            </div>
+
+            <div class="search-input-container">
+                <i class="fas fa-search search-input-icon"></i>
+                <input
+                        type="text"
+                        class="search-input"
+                        id="mongoSearchInput"
+                        placeholder="Enter your search query..."
+                >
+            </div>
+
+            <div class="results-container" id="mongoResults">
+                <div class="no-results">
+                    <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 15px;"></i>
+                    <p>Start typing your search query</p>
+                </div>
+            </div>
+
+            <div class="search-stats" id="mongoStats"></div>
+        </div>
+
+        <!-- PostgreSQL Search -->
+        <div class="search-column">
+            <div class="search-header">
+                <div class="search-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div>
+                    <div class="search-title">PostgreSQL Search</div>
+                    <div class="search-subtitle">Search based on the PostgreSQL GIN index</div>
+                </div>
+            </div>
+
+            <div class="search-input-container">
+                <i class="fas fa-search search-input-icon"></i>
+                <input
+                        type="text"
+                        class="search-input"
+                        id="pgSearchInput"
+                        placeholder="Enter your search query..."
+                >
+            </div>
+
+            <div class="results-container" id="pgResults">
+                <div class="no-results">
+                    <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 15px;"></i>
+                    <p>Start typing your search query</p>
+                </div>
+            </div>
+
+            <div class="search-stats" id="pgStats"></div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/script.js"></script>
+</body>
+</html>
