@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  faq-service:
+    build: .
+    container_name: faq-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      mongo-db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+    networks:
+      - faq-network
+    restart: unless-stopped
+
+  postgres-db:
+    image: postgres:13
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: faq-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - faq-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d faq-service"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mongo-db:
+    image: mongo:5
+    container_name: mongo-db
+    environment:
+      MONGO_INITDB_DATABASE: faq-service
+      MONGO_INITDB_ROOT_USERNAME: faq_user
+      MONGO_INITDB_ROOT_PASSWORD: faq_password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - faq-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/faq-service --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis-cache:
+    image: redis:6-alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - faq-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
+  mongo-data:
+  redis-data:
+
+networks:
+  faq-network:
+    driver: bridge

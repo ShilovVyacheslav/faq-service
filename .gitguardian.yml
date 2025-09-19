@@ -1,4 +1,4 @@
 paths:
   ignore:
     - "src/main/resources/application-Local.yml"
-    - "src/test/**"
+    - "src/main/resources/application-Docker.yml"

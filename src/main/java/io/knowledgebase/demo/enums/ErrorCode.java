@@ -19,7 +19,10 @@ public enum ErrorCode {
     FAQ_NOT_FOUND("FAQ not found with id: %s", 404),
     FAQ_ALREADY_EXISTS("FAQ with question '%s' and answer '%s' already exists", 409),
     FAQ_DOC_NOT_FOUND_BY_ID_ERROR("FaqDoc not found with id: %s", 404),
-    FAQ_DOES_NOT_EXIST_IN_POSTGRE_SQL("FAQ with id %s doesn't exist in PostgreSQL", 404);
+    FAQ_DOES_NOT_EXIST_IN_POSTGRE_SQL("FAQ with id %s doesn't exist in PostgreSQL", 404),
+
+    VALIDATION_FAILED_ERROR_CODE("validation failed", 100556),
+    INVALID_REQUEST_PARAM_ERROR_CODE("invalid request param", 100010);
 
     private final String message;
     private final int code;
