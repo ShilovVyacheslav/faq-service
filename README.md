@@ -102,6 +102,13 @@ This project includes a dedicated page to visually compare the performance and r
 
 Enter keywords and observe the response times and results from PostgreSQL and MongoDB with the Trie index and cached responses.
 
+<img src="src/main/resources/static/images/search.png">
+
+### 3. Test Coverage & Reliability
+The development of this service follows a test-driven mindset to ensure code quality, prevent regressions, and facilitate safe refactoring. The test suite includes unit tests for core business logic, services, and utilities, providing a solid safety net for future development.
+
+<img src="src/main/resources/static/images/tests.png">
+
 ---
 
 ## 🤝 Contributing
