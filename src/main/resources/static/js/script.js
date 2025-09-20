@@ -25,7 +25,7 @@ function handlePgSearch(event) {
         return;
     }
 
-    pgResults.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Поиск...</div>';
+    pgResults.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
 
     pgSearchTimer = setTimeout(() => {
         searchFaq('pg-search', query, pgResults, pgStats);
@@ -41,7 +41,7 @@ function handleMongoSearch(event) {
         return;
     }
 
-    mongoResults.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Поиск...</div>';
+    mongoResults.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
 
     mongoSearchTimer = setTimeout(() => {
         searchFaq('search', query, mongoResults, mongoStats);
@@ -72,7 +72,7 @@ async function searchFaq(endpoint, query, resultsContainer, statsElement) {
         resultsContainer.innerHTML = `
             <div class="no-results">
                 <i class="fas fa-exclamation-triangle" style="color: #f44336;"></i>
-                <p>Ошибка при выполнении поиска</p>
+                <p>Error while performing search</p>
                 <small>${error.message}</small>
             </div>
         `;
@@ -86,16 +86,16 @@ function displayResults(results, container, statsElement, query) {
         container.innerHTML = `
                     <div class="no-results">
                         <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 15px;"></i>
-                        <p>По запросу "${query}" ничего не найдено</p>
+                        <p>Nothing found for "${query}"</p>
                     </div>
                 `;
-        statsElement.textContent = '0 результатов';
+        statsElement.textContent = '0 results';
         return;
     }
 
     const resultsHtml = results.map((item, index) => `
                 <div class="result-item fade-in" style="animation-delay: ${index * 0.1}s">
-                    <div class="result-question">${escapeHtml(item.question || 'Без названия')}</div>
+                    <div class="result-question">${escapeHtml(item.question || 'Untitled')}</div>
                     ${item.keywords && item.keywords.length > 0 ? `
                         <div class="keywords-container">
                             ${item.keywords.map(keyword => `
@@ -104,20 +104,20 @@ function displayResults(results, container, statsElement, query) {
                         </div>
                     ` : ''}
                     <div class="status-badge ${item.active ? 'status-active' : 'status-inactive'}">
-                        ${item.active ? 'Активный' : 'Неактивный'}
+                        ${item.active ? 'Active' : 'Inactive'}
                     </div>
                 </div>
             `).join('');
 
     container.innerHTML = resultsHtml;
-    statsElement.textContent = `${results.length} результат(ов)`;
+    statsElement.textContent = `${results.length} ${results.length === 1 ? 'result' : 'results'}`;
 }
 
 function clearResults(container, statsElement) {
     container.innerHTML = `
                 <div class="no-results">
                     <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 15px;"></i>
-                    <p>Начните вводить запрос для поиска</p>
+                    <p>Start typing your search query</p>
                 </div>
             `;
     statsElement.textContent = '';
