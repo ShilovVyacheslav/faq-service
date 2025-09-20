@@ -81,8 +81,15 @@ This project is built with a cutting-edge suite of technologies to ensure perfor
 2. **Manual Setup (Alternative):**
     *   Configure your databases and update the `application-Local.yml` file with your connection strings.
     *   Build and run the application:
+   
+    **Linux / macOS:**
     ```bash
     ./mvnw clean package
+    java -jar target/faq-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=Local
+    ```
+   **Windows:**
+    ```bash
+    .\mvnw.cmd clean package
     java -jar target/faq-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=Local
     ```
 
