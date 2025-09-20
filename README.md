@@ -99,7 +99,7 @@ This project is built with a cutting-edge suite of technologies to ensure perfor
 
 ### 1. API Documentation (Swagger UI)
 Once the application is running, interact with the full API specification via Swagger UI:
-👉 **[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)**
+👉 **[http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)**
 
 You can authenticate, retrieve a JWT token, and test all available endpoints for FAQ and user management in Postman.
 
