@@ -1,3 +1,48 @@
 spring:
+  main:
+    banner-mode: off
   application:
     name: faq-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  flyway:
+    url: ${SPRING_FLYWAY_URL}
+    user: ${SPRING_FLYWAY_USER}
+    password: ${SPRING_FLYWAY_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  security:
+    jwt:
+      secret-key: ${SECURITY_JWT_SECRET_KEY}
+      access-expiration: ${SECURITY_JWT_ACCESS_EXPIRATION}
+      refresh-expiration: ${SECURITY_JWT_REFRESH_EXPIRATION}
+  cache:
+    type: redis
+  data:
+    mongodb:
+      host: ${SPRING_MONGODB_HOST}
+      port: ${SPRING_MONGODB_PORT}
+      database: ${SPRING_MONGODB_DATABASE}
+      username: ${SPRING_MONGODB_USERNAME}
+      password: ${SPRING_MONGODB_PASSWORD}
+    redis:
+      enabled: ${SPRING_REDIS_ENABLED:false}
+      host: ${SPRING_REDIS_HOST}
+      port: ${SPRING_REDIS_PORT}
+      password: ${SPRING_REDIS_PASSWORD}
+      flush-on-startup: ${SPRING_REDIS_FLUSH_ON_STARTUP:true}
+
+logging:
+  config: classpath:local-logback-spring.xml
+
+scheduler:
+  defaultLockAtMostFor: ${SCHEDULER_DEFAULT_LOCK_AT_MOST_FOR:30m}
+  faq-sync:
+    cron: ${SCHEDULER_FAQ_SYNC_CRON:0 */15 * * * *}
+    enabled: ${SCHEDULER_FAQ_SYNC_ENABLED:false}
+    lockAtLeastFor: ${SCHEDULER_FAQ_SYNC_LOCK_AT_LEAST_FOR:1m}
+    lockAtMostFor: ${SCHEDULER_FAQ_SYNC_LOCK_AT_MOST_FOR:20m}

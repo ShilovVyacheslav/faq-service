@@ -1,16 +1,33 @@
 spring:
+  config:
+    activate:
+      on-profile: docker
   main:
     banner-mode: off
   application:
     name: faq-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/faq-service
+    url: jdbc:postgresql://postgres-db:5432/faq-service
     username: postgres
     password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     url: ${spring.datasource.url}
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
+    locations: classpath:db/migration
+  h2:
+    console:
+      enabled: false
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   security:
     jwt:
       secret-key: k8s9f7j2m5p3q6r1t4v7x9z0b2d4g6h8j0l2n4p6r8t1v3x5z7y9w5u3a1c8e0g2i4
@@ -20,20 +37,25 @@ spring:
     type: redis
   data:
     mongodb:
-      host: localhost
+      host: mongo-db
       port: 27017
       database: faq-service
       username: "faq_user"
       password: "faq_password"
     redis:
-      enabled: false
-      host: localhost
+      enabled: true
+      host: redis-cache
       port: 6379
       password:
       flush-on-startup: true
 
 logging:
-  config: classpath:local-logback-spring.xml
+  level:
+    org.springframework.jdbc: DEBUG
+    com.zaxxer.hikari: DEBUG
+    org.flywaydb: DEBUG
+    org.hibernate: INFO
+  config: classpath:logback-spring.xml
 
 scheduler:
   defaultLockAtMostFor: "3m"
