@@ -31,6 +31,7 @@ spring:
       host: mongo-db
       port: 27017
       database: faq-service
+      authentication-database: admin
       username: "faq_user"
       password: "faq_password"
     redis:
