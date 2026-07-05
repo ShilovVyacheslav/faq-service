@@ -12,22 +12,13 @@ spring:
     password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     url: ${spring.datasource.url}
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
     locations: classpath:db/migration
-  h2:
-    console:
-      enabled: false
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   security:
     jwt:
       secret-key: k8s9f7j2m5p3q6r1t4v7x9z0b2d4g6h8j0l2n4p6r8t1v3x5z7y9w5u3a1c8e0g2i4
