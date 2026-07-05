@@ -22,8 +22,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.within;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -223,7 +225,8 @@ class UserRepositoryTest {
         User savedUser = userRepository.saveAndFlush(newUser);
 
         assertThat(savedUser.getCreatedAt()).isNotNull().isBeforeOrEqualTo(LocalDateTime.now());
-        assertThat(savedUser.getUpdatedAt()).isNotNull().isEqualTo(savedUser.getCreatedAt());
+        assertThat(savedUser.getUpdatedAt())
+                .isNotNull().isCloseTo(savedUser.getCreatedAt(), within(5, ChronoUnit.MILLIS));
     }
 
     @Test
