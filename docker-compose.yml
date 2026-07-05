@@ -18,9 +18,15 @@ services:
     networks:
       - faq-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   postgres-db:
-    image: postgres:13
+    image: postgres:17.5
     container_name: postgres-db
     environment:
       POSTGRES_DB: faq-service
@@ -39,7 +45,7 @@ services:
       retries: 10
 
   mongo-db:
-    image: mongo:5
+    image: mongo:7.0
     container_name: mongo-db
     environment:
       MONGO_INITDB_DATABASE: faq-service

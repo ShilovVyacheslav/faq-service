@@ -1,0 +1,10 @@
+target/
+.idea/
+.git/
+.gitignore
+.gitattributes
+.gitguardian.yml
+*.md
+HELP.md
+LICENSE
+docker-compose.yml

@@ -1,4 +1,8 @@
-# FAQ Service: Enterprise Knowledge Base & Onboarding Platform
+<div align="center">
+
+# FAQ Service
+
+**Enterprise Knowledge Base & Onboarding Platform**
 
 ![Java](https://img.shields.io/badge/Java-21-blue.svg)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.5-brightgreen.svg)
@@ -8,13 +12,17 @@
 ![Redis](https://img.shields.io/badge/Redis-Cache-orange.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-## Overview
-
-**FAQ Service** is a high-performance, scalable, and secure backend service designed to power internal knowledge bases and employee onboarding experiences. This enterprise-grade solution enables organizations to centralize Frequently Asked Questions (FAQs), drastically reducing onboarding time, improving information discoverability, and empowering employees with instant access to critical knowledge.
+</div>
 
 ---
 
-## ⚠️ Legal Disclaimer & Notice
+## | Overview
+
+**FAQ Service** is a Spring Boot backend for an internal knowledge base: JWT-secured REST API with role-based access control, PostgreSQL as the system of record, and a scheduled sync job that mirrors FAQ data into MongoDB for a second, independently-built search path — a custom Trie index cached in Redis, run side by side with PostgreSQL's native full-text search so the two approaches can be compared directly.
+
+---
+
+## ⚠️ Disclaimer
 
 This project, **FAQ Service**, is a demonstration artifact and a Minimum Viable Product (MVP).
 
@@ -24,108 +32,114 @@ This project, **FAQ Service**, is a demonstration artifact and a Minimum Viable 
 
 ---
 
-## Key Features
+## | Features
 
-*   **🔐 Robust Authentication & Authorization:** Secure JWT-based authentication with role-based access control (Admin/User).
-*   **⚡ Multi-Engine Search:** Experience and compare the performance of two distinct search methodologies:
+*   **Authentication & Authorization:** Basic Auth for login/registration, then JWT for all subsequent requests, with role-based access control (Admin/User).
+*   **Two search implementations, compared side by side:**
     *   **PostgreSQL GIN Index:** Traditional full-text search using PostgreSQL's powerful GIN indexes.
     *   **MongoDB + Trie + Redis:** A custom-built, ultra-fast prefix-based search algorithm for instant autocomplete and keyword lookup.
-*   **📊 Admin Management Portal:** Full CRUD operations for managing FAQs and users through a RESTful API.
-*   **🔄 Automated Synchronization:** Scheduled jobs (using ShedLock) to keep search indices and databases in sync.
-*   **📚 API First:** Comprehensive OpenAPI 3.0 documentation for easy integration with frontend applications (web, mobile, internal tools).
-*   **🐳 Docker Ready:** Containerized for easy deployment and scaling in modern cloud environments.
+*   **Admin API:** Full CRUD operations for managing FAQs and users via REST.
+*   **Scheduled sync:** ShedLock-coordinated jobs keep both search backends in sync.
+*   **API docs:** OpenAPI 3 spec, auto-generated from annotated controllers via Springdoc, browsable through Swagger UI.
+*   **Containerized:** one docker-compose spins up the app plus Postgres, MongoDB, and Redis.
 
 ---
 
-## 🛠 Technology Stack
-
-This project is built with a cutting-edge suite of technologies to ensure performance, reliability, and developer happiness.
+## | Tech Stack
 
 | Layer | Technology                                          |
 | :--- |:----------------------------------------------------|
 | **Framework** | Spring Boot 3.5.5, Spring Security, Spring Data     |
 | **Language** | Java 21                                             |
-| **Database** | PostgreSQL 17.5 (Primary), MongoDB (Document Store) |
+| **Database** | PostgreSQL 17.5 (primary), MongoDB (document store) |
 | **Caching** | Redis                                               |
 | **Search** | PostgreSQL GIN, MongoDB Custom In-Memory Trie       |
-| **Auth** | JWT-authentication, base64 auth                     |
-| **API Docs** | Springdoc OpenAPI 2.8.0                             |
+| **Auth** | Basic Auth (login/register) + JWT (jjwt) for authenticated requests |
+| **API Docs** | Springdoc OpenAPI 2.8.0 (generates OpenAPI 3 spec) |
 | **Task Scheduling** | ShedLock                                            |
 | **Database Migration** | Flyway                                              |
 | **Mapping** | MapStruct                                           |
-| **Logging** | Logback with Logstash encoder                       |
+| **Logging** | Logback + Logstash encoder                          |
 | **Code Quality** | Checkstyle, Lombok                                  |
 | **Packaging** | Docker                                              |
 
 ---
 
-## 🚦 Getting Started
+## | Getting Started
 
 ### Prerequisites
 
 *   Java 21
 *   Maven 3.6+
-*   Docker & Docker Compose (Recommended)
 *   PostgreSQL 17+
 *   MongoDB 7+
 *   Redis
+*   Docker (optional)
 
 ### Installation & Deployment
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/ShilovVyacheslav/faq-service.git
-    cd faq-service
-    ```
+**Clone the repository:**
+```bash
+git clone https://github.com/ShilovVyacheslav/faq-service.git
+cd faq-service
+```
 
-2. **Manual Setup (Alternative):**
-    *   Configure your databases and update the `application-Local.yml` file with your connection strings.
-    *   Build and run the application:
+#### Option 1: Local (recommended)
+
+**Manual Setup:**
+*   Configure your databases and update the `application-Local.yml` file with your connection credentials.
+*   Build and run the application:
    
-    **Linux / macOS:**
-    ```bash
-    ./mvnw clean package
-    java -jar target/faq-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=Local
-    ```
-   **Windows:**
-    ```bash
-    .\mvnw.cmd clean package
-    java -jar target/faq-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=Local
-    ```
+**Linux / macOS:**
+```bash
+chmod +x ./mvnw
+./mvnw clean package
+java -jar target/faq-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=Local
+```
+**Windows:**
+```bash
+.\mvnw.cmd clean package
+java -jar target/faq-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=Local
+```
+
+#### Option 2: Docker
+
+Requires only Docker and Docker Compose.
+```bash
+docker-compose up --build
+```
+
+This builds the app inside a container and starts Postgres, MongoDB, and Redis alongside it. The app is available at `http://localhost:8080` once all health checks pass.
 
 ---
 
-## 🔍 Exploring the API & Search Demo
+## | Exploring the API
 
-### 1. API Documentation (Swagger UI)
-Once the application is running, interact with the full API specification via Swagger UI:
-👉 **[http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)**
+### 1. API Documentation
+**Swagger UI: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)**
 
-You can authenticate, retrieve a JWT token, and test all available endpoints for FAQ and user management in Postman.
+Authenticate, retrieve a JWT token, and test all endpoints for FAQ and user management in Postman.
 
-### 2. Search Performance Demo
-This project includes a dedicated page to visually compare the performance and results of the different search implementations.
-👉 **[http://localhost:8080/search.html](http://localhost:8080/search.html)**
+### 2. Search Demo
+**[http://localhost:8080/search.html](http://localhost:8080/search.html)**
 
 Enter keywords and observe the response times and results from PostgreSQL and MongoDB with the Trie index and cached responses.
 
 <img src="src/main/resources/static/images/search.png">
 
-### 3. Test Coverage & Reliability
-The development of this service follows a test-driven mindset to ensure code quality, prevent regressions, and facilitate safe refactoring. The test suite includes unit tests for core business logic, services, and utilities, providing a solid safety net for future development.
+### 3. Test Coverage
+Unit tests cover core business logic, services, and utilities.
 
 <img src="src/main/resources/static/images/tests.png">
 
 ---
 
-## 🤝 Contributing
-
-This is an MVP. Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
-
----
-
-## 💡 Why This Project?
+## Why This Project?
 
 Every company, regardless of size, struggles with knowledge silos and inefficient onboarding. This service provides a ready-to-deploy, technologically advanced solution to this universal problem. It's not just a FAQ system; it's a productivity multiplier engineered for the modern enterprise.
 
-**Ready to accelerate your onboarding and unlock your company's knowledge?** This codebase is the perfect foundation.
+---
+
+## License
+
+MIT
