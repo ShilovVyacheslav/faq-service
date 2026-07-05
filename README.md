@@ -10,6 +10,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.5-informational.svg)
 ![MongoDB](https://img.shields.io/badge/MongoDB-7.0-green.svg)
 ![Redis](https://img.shields.io/badge/Redis-Cache-orange.svg)
+![CI](https://github.com/ShilovVyacheslav/faq-service/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 </div>
