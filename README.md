@@ -112,6 +112,13 @@ docker-compose up --build
 
 This builds the app inside a container and starts Postgres, MongoDB, and Redis alongside it. The app is available at `http://localhost:8080` once all health checks pass.
 
+### Default Admin Account
+
+On first startup, a Flyway migration seeds one admin user. You need it to log in and create any other users or FAQs:
+
+- **Username:** `admin`
+- **Password:** `@Password0`
+
 ---
 
 ## | Exploring the API
