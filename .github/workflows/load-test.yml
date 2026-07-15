@@ -1,0 +1,7 @@
+name: Load Test
+on: workflow_dispatch
+jobs:
+  stub:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "plug"
