@@ -23,13 +23,9 @@
 
 ---
 
-## | Disclaimer
+## | Performance
 
-This project, **FAQ Service**, is a demonstration artifact and a Minimum Viable Product (MVP).
-
-*   **It is not a commercial product** and is not affiliated with, endorsed by, or a copy of any proprietary system from any existing company.
-*   The codebase has been developed as a generic solution to a common business need and **does not contain any proprietary logic, data, or intellectual property** from any specific organization.
-*   This project is presented "as-is" for the purposes of evaluation, demonstration, and as a potential starting point for custom development. It may require further hardening, customization, and scaling to meet specific production requirements.
+Load-tested the Trie + Redis search path against a 10,000-document dataset: **p50 1.5ms**, 95.7% cache hit rate. Full analysis: [docs/load-test-analysis.md](docs/load-test-analysis.md).
 
 ---
 
@@ -111,43 +107,40 @@ Unit tests cover core business logic, services, and utilities.
 
 ## | Features
 
-*   **Authentication & Authorization:** Basic Auth for login/registration, then JWT for all subsequent requests, with role-based access control (Admin/User).
-*   **Two search implementations, compared side by side:**
+*   **Authentication & Authorization:** Basic Auth for login, then JWT for all subsequent requests, with role-based access control (Admin/User).
+*   **Two search implementations:**
     *   **PostgreSQL GIN Index:** Traditional full-text search using PostgreSQL's powerful GIN indexes.
-    *   **MongoDB + Trie + Redis:** A custom-built, ultra-fast prefix-based search algorithm for instant autocomplete and keyword lookup.
+    *   **MongoDB + Trie + Redis:** A custom-built prefix-based search algorithm for instant responses.
 *   **Admin API:** Full CRUD operations for managing FAQs and users via REST.
 *   **Scheduled sync:** ShedLock-coordinated jobs keep both search backends in sync.
-*   **API docs:** OpenAPI 3 spec, auto-generated from annotated controllers via Springdoc, browsable through Swagger UI.
 *   **Containerized:** one docker-compose spins up the app plus Postgres, MongoDB, and Redis.
 
 ---
 
 ## | Tech Stack
 
-| Layer | Technology                                          |
-| :--- |:----------------------------------------------------|
-| **Framework** | Spring Boot 3.5.5, Spring Security, Spring Data     |
-| **Language** | Java 21                                             |
-| **Database** | PostgreSQL 17.5 (primary), MongoDB (document store) |
-| **Caching** | Redis                                               |
-| **Search** | PostgreSQL GIN, MongoDB Custom In-Memory Trie       |
-| **Auth** | Basic Auth (login/register) + JWT (jjwt) for authenticated requests |
-| **API Docs** | Springdoc OpenAPI 2.8.0 (generates OpenAPI 3 spec) |
-| **Task Scheduling** | ShedLock                                            |
-| **Database Migration** | Flyway                                              |
-| **Mapping** | MapStruct                                           |
-| **Logging** | Logback + Logstash encoder                          |
-| **Code Quality** | Checkstyle, Lombok                                  |
-| **Packaging** | Docker                                              |
+| Layer | Technology                                                 |
+| :--- |:-----------------------------------------------------------|
+| **Framework** | Spring Boot 3.5.5, Spring Security, Spring Data            |
+| **Language** | Java 21                                                    |
+| **Database** | PostgreSQL 17.5 (primary), MongoDB (document store)        |
+| **Caching** | Redis                                                      |
+| **Search** | PostgreSQL GIN, MongoDB Custom In-Memory Trie              |
+| **Auth** | Basic Auth (login) + JWT (jjwt) for authenticated requests |
+| **API Docs** | Springdoc OpenAPI 2.8.0 (generates OpenAPI 3 spec)         |
+| **Task Scheduling** | ShedLock                                                   |
+| **Database Migration** | Flyway                                                     |
+| **Mapping** | MapStruct                                                  |
+| **Logging** | Logback + Logstash encoder                                 |
+| **Code Quality** | Checkstyle, Lombok                                         |
+| **Packaging** | Docker                                                     |
 
 ---
 
-## Why This Project?
+## | Disclaimer
 
-Every company, regardless of size, struggles with knowledge silos and inefficient onboarding. This service provides a ready-to-deploy, technologically advanced solution to this universal problem. It's not just a FAQ system; it's a productivity multiplier engineered for the modern enterprise.
+This project, **FAQ Service**, is a demonstration artifact and a Minimum Viable Product (MVP).
 
----
-
-## License
-
-MIT
+*   **It is not a commercial product** and is not affiliated with, endorsed by, or a copy of any proprietary system from any existing company.
+*   The codebase has been developed as a generic solution to a common business need and **does not contain any proprietary logic, data, or intellectual property** from any specific organization.
+*   This project is presented "as-is" for the purposes of evaluation, demonstration, and as a potential starting point for custom development. It may require further hardening, customization, and scaling to meet specific production requirements.
