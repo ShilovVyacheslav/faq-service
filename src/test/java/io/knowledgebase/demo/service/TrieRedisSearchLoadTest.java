@@ -53,7 +53,7 @@ class TrieRedisSearchLoadTest {
     private static final int DOC_COUNT = 10_000;
     private static final int MIN_KEYWORDS_PER_DOC = 6;
     private static final int MAX_KEYWORDS_PER_DOC = 8;
-    private static final int SEED_BATCH_SIZE = 1000;
+    private static final int GENERATE_BATCH_SIZE = 1000;
 
     @Container
     static MongoDBContainer mongo = new MongoDBContainer(DockerImageName.parse("mongo:7.0"));
@@ -63,8 +63,14 @@ class TrieRedisSearchLoadTest {
             new GenericContainer<>(DockerImageName.parse("redis:6-alpine"))
                     .withExposedPorts(6379);
 
+    static {
+        mongo.start();
+        redis.start();
+    }
+
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", () -> mongo.getReplicaSetUrl("faq-service-loadtest"));
         registry.add("spring.data.mongodb.host", mongo::getHost);
         registry.add("spring.data.mongodb.port", () -> mongo.getMappedPort(27017));
         registry.add("spring.data.mongodb.database", () -> "faq-service-loadtest");
@@ -95,44 +101,43 @@ class TrieRedisSearchLoadTest {
     @Autowired
     private CacheManager cacheManager;
 
-    private List<String> plainCorpus;
-    private List<String> wildcardCorpus;
+    private List<String> exactTerms;
+    private List<String> wildcardTerms;
     private List<QueryCase> queries;
     private Cache faqDocsCache;
 
-    private record QueryCase(String category, String text) {
-    }
+    private record QueryCase(String category, String text) {}
 
     private record QueryResult(
             String category,
             String text,
             long elapsedNanos,
-            int touchedDocs,
+            int matchedDocs,
             int cachedBeforeCall,
             int resultCount
     ) {
         boolean isFullHit() {
-            return touchedDocs > 0 && cachedBeforeCall == touchedDocs;
+            return matchedDocs > 0 && cachedBeforeCall == matchedDocs;
         }
 
         boolean isFullMiss() {
-            return touchedDocs > 0 && cachedBeforeCall == 0;
+            return matchedDocs > 0 && cachedBeforeCall == 0;
         }
 
         boolean isPartial() {
-            return touchedDocs > 0 && cachedBeforeCall > 0 && cachedBeforeCall < touchedDocs;
+            return matchedDocs > 0 && cachedBeforeCall > 0 && cachedBeforeCall < matchedDocs;
         }
 
         boolean isEmpty() {
-            return touchedDocs == 0;
+            return matchedDocs == 0;
         }
     }
 
     @BeforeAll
     void setUp() throws IOException {
         List<String> wordlist = readLines("load-test-wordlist.txt");
-        plainCorpus = wordlist.stream().filter(w -> !w.endsWith("*")).toList();
-        wildcardCorpus = wordlist.stream().filter(w -> w.endsWith("*")).toList();
+        exactTerms = wordlist.stream().filter(w -> !w.endsWith("*")).toList();
+        wildcardTerms = wordlist.stream().filter(w -> w.endsWith("*")).toList();
 
         queries = readLines("search-queries.tsv").stream()
                 .map(line -> {
@@ -143,9 +148,9 @@ class TrieRedisSearchLoadTest {
 
         assertThat(queries).hasSize(1000);
 
-        System.out.println("Seeding " + DOC_COUNT + " FAQ documents...");
-        seedFaqDocuments();
-        System.out.println("Seeding complete.");
+        System.out.println("Generating " + DOC_COUNT + " FAQ documents...");
+        generateFaqDocuments();
+        System.out.println("Generation complete.");
 
         Cache cache = cacheManager.getCache("faqDocs");
         assertThat(cache).as("faqDocs cache must be active (spring.data.redis.enabled=true)").isNotNull();
@@ -154,13 +159,13 @@ class TrieRedisSearchLoadTest {
         System.out.println("faqDocs cache cleared - starting from a cold cache.");
     }
 
-    private void seedFaqDocuments() {
+    private void generateFaqDocuments() {
         Random random = new Random(2024);
-        List<String> combined = new ArrayList<>(plainCorpus);
-        combined.addAll(wildcardCorpus);
+        List<String> combined = new ArrayList<>(exactTerms);
+        combined.addAll(wildcardTerms);
 
-        List<FaqDoc> batch = new ArrayList<>(SEED_BATCH_SIZE);
-        for (long id = 1; id <= DOC_COUNT; id++) {
+        List<FaqDoc> batch = new ArrayList<>(GENERATE_BATCH_SIZE);
+        for (long id = 1; id <= DOC_COUNT; ++id) {
             int keywordCount = MIN_KEYWORDS_PER_DOC
                     + random.nextInt(MAX_KEYWORDS_PER_DOC - MIN_KEYWORDS_PER_DOC + 1);
             Set<String> keywordSet = new LinkedHashSet<>();
@@ -178,19 +183,19 @@ class TrieRedisSearchLoadTest {
                     .build();
 
             batch.add(doc);
-            if (batch.size() == SEED_BATCH_SIZE) {
-                flushSeedBatch(batch);
+            if (batch.size() == GENERATE_BATCH_SIZE) {
+                saveBatch(batch);
                 if (id % 2000 == 0) {
-                    System.out.println("  seeded " + id + " / " + DOC_COUNT);
+                    System.out.println("  generated " + id + " / " + DOC_COUNT);
                 }
             }
         }
         if (!batch.isEmpty()) {
-            flushSeedBatch(batch);
+            saveBatch(batch);
         }
     }
 
-    private void flushSeedBatch(List<FaqDoc> batch) {
+    private void saveBatch(List<FaqDoc> batch) {
         faqDocRepository.saveAll(batch);
         batch.forEach(trieRedisSearchService::indexFaqDoc);
         batch.clear();
@@ -237,8 +242,8 @@ class TrieRedisSearchLoadTest {
         List<QueryResult> results = new ArrayList<>(queries.size());
 
         for (QueryCase query : queries) {
-            Set<Long> touchedIds = resolveTouchedDocIds(query.text());
-            int cachedBefore = countCached(touchedIds);
+            Set<Long> matchedIds = findMatchingDocIds(query.text());
+            int cachedBefore = countCached(matchedIds);
 
             long start = System.nanoTime();
             List<FaqPreviewDto> searchResults = trieRedisSearchService.search(query.text());
@@ -248,7 +253,7 @@ class TrieRedisSearchLoadTest {
                     query.category(),
                     query.text(),
                     elapsed,
-                    touchedIds.size(),
+                    matchedIds.size(),
                     cachedBefore,
                     searchResults.size()
             ));
@@ -272,27 +277,27 @@ class TrieRedisSearchLoadTest {
                 .filter(r -> r.category().equals("no_match") && r.resultCount() > 0)
                 .count();
         assertThat(noMatchWithResults)
-                .as("no_match queries are built from words outside the corpus and should return nothing")
+                .as("no_match queries are built from words that don't appear in any document and should return nothing")
                 .isZero();
     }
 
-    private Set<Long> resolveTouchedDocIds(String query) {
-        Set<Long> touched = new HashSet<>();
+    private Set<Long> findMatchingDocIds(String query) {
+        Set<Long> matched = new HashSet<>();
         for (String rawTerm : query.split("\\s+")) {
             String normalized = keywordNormalizer.normalize(rawTerm);
             if (!keywordNormalizer.isValid(normalized)) {
                 continue;
             }
-            touched.addAll(trieService.search(normalized));
+            matched.addAll(trieService.search(normalized));
         }
-        return touched;
+        return matched;
     }
 
     private int countCached(Set<Long> ids) {
         int count = 0;
         for (Long id : ids) {
             if (faqDocsCache.get(id.toString()) != null) {
-                count++;
+                ++count;
             }
         }
         return count;
@@ -333,24 +338,24 @@ class TrieRedisSearchLoadTest {
                 allNanos.add(qr.elapsedNanos());
 
                 if (qr.isEmpty()) {
-                    r.emptyCount++;
+                    ++r.emptyCount;
                     emptyNanos.add(qr.elapsedNanos());
                     continue;
                 }
                 if (qr.isFullHit()) {
-                    r.fullHitCount++;
+                    ++r.fullHitCount;
                     hitNanos.add(qr.elapsedNanos());
                 } else if (qr.isFullMiss()) {
-                    r.fullMissCount++;
+                    ++r.fullMissCount;
                     missNanos.add(qr.elapsedNanos());
                 } else if (qr.isPartial()) {
-                    r.partialCount++;
+                    ++r.partialCount;
                     missNanos.add(qr.elapsedNanos());
                 }
 
-                r.totalDocReads += qr.touchedDocs();
+                r.totalDocReads += qr.matchedDocs();
                 r.totalCacheHitReads += qr.cachedBeforeCall();
-                r.totalCacheMissReads += (qr.touchedDocs() - qr.cachedBeforeCall());
+                r.totalCacheMissReads += (qr.matchedDocs() - qr.cachedBeforeCall());
             }
 
             List<Long> sortedAll = allNanos.stream().sorted().toList();
@@ -388,7 +393,7 @@ class TrieRedisSearchLoadTest {
 
         void printTo() {
             System.out.println();
-            System.out.println("===== Trie + Redis search load test: 1000 queries over a 10,000-doc corpus =====");
+            System.out.println("===== Trie + Redis search load test: 1000 queries over a 10,000-doc database =====");
             System.out.printf(Locale.ROOT, "Overall avg latency:          %.3f ms%n", overallAvgMs);
             System.out.printf(Locale.ROOT, "p50 / p95 / p99 latency:      %.3f / %.3f / %.3f ms%n", p50Ms, p95Ms, p99Ms);
             System.out.println();
@@ -396,7 +401,7 @@ class TrieRedisSearchLoadTest {
                     avgMsWithMisses, fullMissCount + partialCount);
             System.out.printf(Locale.ROOT, "Avg latency, full cache hit:                %.3f ms  (n=%d)%n",
                     avgMsNoMisses, fullHitCount);
-            System.out.printf(Locale.ROOT, "Avg latency, empty result (no docs touched): %.3f ms  (n=%d)%n",
+            System.out.printf(Locale.ROOT, "Avg latency, empty result (no docs matched): %.3f ms  (n=%d)%n",
                     avgMsEmptyResult, emptyCount);
             System.out.println();
             System.out.printf(Locale.ROOT, "Query classification: full_hit=%d  partial=%d  full_miss=%d  empty=%d%n",
@@ -412,10 +417,10 @@ class TrieRedisSearchLoadTest {
             Files.createDirectories(path.getParent());
             StringBuilder sb = new StringBuilder();
             sb.append("# Trie + Redis Search Load Test Report\n\n");
-            sb.append("- Corpus: 10,000 FAQ documents, 6-8 keywords each, drawn from a 2000-word corpus ")
+            sb.append("- Documents: 10,000 FAQ entries, 6-8 keywords each, drawn from 2,000 unique keywords ")
                     .append("(20% wildcard/prefix entries)\n");
             sb.append("- Queries: 1000 total (100 handwritten, 400 exact, 400 wildcard-fallback, 100 no-match)\n");
-            sb.append("- Cache: warmed during seeding, then explicitly cleared before the measured phase\n\n");
+            sb.append("- Cache: warmed during generating, then explicitly cleared before the measured phase\n\n");
 
             sb.append("## Latency\n\n");
             sb.append("| Metric | Value |\n|---|---|\n");
@@ -441,12 +446,12 @@ class TrieRedisSearchLoadTest {
                     fullHitCount, partialCount, fullMissCount, emptyCount));
 
             sb.append("\n## By query category\n\n");
-            sb.append("| Category | Count | Avg latency (ms) | Avg docs touched |\n|---|---|---|---|\n");
+            sb.append("| Category | Count | Avg latency (ms) | Avg docs matched |\n|---|---|---|---|\n");
             for (String category : List.of("handwritten", "exact", "wildcard_fallback", "no_match")) {
                 List<QueryResult> subset = raw.stream().filter(r -> r.category().equals(category)).toList();
                 double avg = avgMs(subset.stream().map(QueryResult::elapsedNanos).toList());
                 double avgDocs = subset.isEmpty() ? 0.0
-                        : subset.stream().mapToInt(QueryResult::touchedDocs).average().orElse(0.0);
+                        : subset.stream().mapToInt(QueryResult::matchedDocs).average().orElse(0.0);
                 sb.append(String.format(Locale.ROOT, "| %s | %d | %.3f | %.1f |%n",
                         category, subset.size(), avg, avgDocs));
             }
