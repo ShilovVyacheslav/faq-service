@@ -1,10 +1,34 @@
-target/
-.idea/
-.git/
+# Version Control
+.git
 .gitignore
 .gitattributes
 .gitguardian.yml
-*.md
-HELP.md
+.github
+
+# IDE & Editors
+.idea/
+.vscode/
+**/*.iml
+*.ipr
+*.iws
+
+# Maven / Java build output
+**/target/
+**/.mvn/
+**/mvnw
+**/mvnw.cmd
+**/*.class
+
+# Documentation
+**/*.md
 LICENSE
-docker-compose.yml
+
+# Environment Files
+.env*
+!.env.example
+
+# OS & System Files
+**/.DS_Store
+**/Thumbs.db
+Desktop.ini
+**/*.log

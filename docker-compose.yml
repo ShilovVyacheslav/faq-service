@@ -1,37 +1,12 @@
-version: '3.8'
+name: faq-service
 
 services:
-  faq-service:
-    build: .
-    container_name: faq-service
-    ports:
-      - "8080:8080"
+  postgres-faq:
+    image: postgres:17-alpine
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-    depends_on:
-      postgres-db:
-        condition: service_healthy
-      mongo-db:
-        condition: service_healthy
-      redis-cache:
-        condition: service_healthy
-    networks:
-      - faq-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
-
-  postgres-db:
-    image: postgres:17.5
-    container_name: postgres-db
-    environment:
-      POSTGRES_DB: faq-service
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -39,18 +14,17 @@ services:
     networks:
       - faq-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d faq-service"]
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
       interval: 5s
       timeout: 5s
       retries: 10
+    mem_limit: 256m
 
-  mongo-db:
-    image: mongo:7.0
-    container_name: mongo-db
+  mongo-faq:
+    image: mongo:4.4
     environment:
-      MONGO_INITDB_DATABASE: faq-service
-      MONGO_INITDB_ROOT_USERNAME: faq_user
-      MONGO_INITDB_ROOT_PASSWORD: faq_password
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     ports:
       - "27017:27017"
     volumes:
@@ -58,14 +32,17 @@ services:
     networks:
       - faq-network
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/faq-service --quiet
+      test: [ "CMD-SHELL", "mongo --quiet --eval \"db.adminCommand('ping')\" -u $${MONGO_INITDB_ROOT_USERNAME} -p $${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin | grep -q 'ok.*1'" ]
       interval: 5s
       timeout: 5s
       retries: 10
+    mem_limit: 256m
 
-  redis-cache:
-    image: redis:6-alpine
-    container_name: redis-cache
+  redis-faq:
+    image: redis:7-alpine
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: redis-server --requirepass ${REDIS_PASSWORD}
     ports:
       - "6379:6379"
     volumes:
@@ -73,10 +50,35 @@ services:
     networks:
       - faq-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD-SHELL", "redis-cli -a $$REDIS_PASSWORD ping | grep PONG" ]
       interval: 5s
       timeout: 5s
       retries: 10
+    mem_limit: 128m
+
+  faq-service:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-faq:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATA_MONGODB_URI: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo-faq:27017/faq_service?authSource=admin
+      SPRING_DATA_REDIS_HOST: redis-faq
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD}
+      SECURITY_JWT_SECRET_KEY: ${SECURITY_JWT_SECRET_KEY}
+    depends_on:
+      postgres-faq:
+        condition: service_healthy
+      mongo-faq:
+        condition: service_healthy
+      redis-faq:
+        condition: service_healthy
+    networks:
+      - faq-network
+    mem_limit: 512m
 
 volumes:
   postgres-data:
