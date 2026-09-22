@@ -4,12 +4,13 @@
 
 **Enterprise Knowledge Base & Onboarding Platform**
 
-![Java](https://img.shields.io/badge/Java-21-blue.svg)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.5-brightgreen.svg)
-![Spring Security](https://img.shields.io/badge/Spring%20Security-3.3.5-red)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.5-informational.svg)
-![MongoDB](https://img.shields.io/badge/MongoDB-7.0-green.svg)
-![Redis](https://img.shields.io/badge/Redis-Cache-orange.svg)
+![Java](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.5-6DB33F?logo=springboot&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-3.9.11-C71A36?logo=apachemaven&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-4.4-47A248?logo=mongodb&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-7.0-DC382D?logo=redis&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker%20Compose-2496ED?logo=docker&logoColor=white)
 ![CI](https://github.com/ShilovVyacheslav/faq-service/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
@@ -31,16 +32,12 @@ Load-tested the Trie + Redis search path against a 10,000-document dataset: **p5
 
 ## | Getting Started
 
-### Prerequisites
+**API Documentation: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)**
 
-*   Java 21
-*   Maven 3.6+
-*   PostgreSQL 17+
-*   MongoDB 7+
-*   Redis
-*   Docker (optional)
+**Default Admin Account**
 
-### Installation & Deployment
+- Username: `admin`
+- Password: `@Password0`
 
 **Clone the repository:**
 ```bash
@@ -48,60 +45,81 @@ git clone https://github.com/ShilovVyacheslav/faq-service.git
 cd faq-service
 ```
 
-#### Option 1: Local (recommended)
+---
 
-**Manual Setup:**
-*   Configure your databases and update the `application-Local.yml` file with your connection credentials.
-*   Build and run the application:
-   
-**Linux / macOS:**
+<details>
+<summary><b>Option 1: Docker (recommended)</b></summary>
+
+<br>
+
+### Option 1: Docker (recommended)
+
+<table>
+<colgroup><col style="width: 50%"><col style="width: 50%"></colgroup>
+<tr><th>bash / zsh / sh</th><th>PowerShell</th></tr>
+<tr><td>
+
 ```bash
-chmod +x ./mvnw
-./mvnw clean package
-java -jar target/faq-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=Local
+cp .env.example .env.docker
 ```
-**Windows:**
+
+</td><td>
+
 ```bash
-.\mvnw.cmd clean package
-java -jar target/faq-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=Local
+Copy-Item .env.example .env.docker
 ```
 
-#### Option 2: Docker
+</td></tr>
+</table>
 
-Requires only Docker and Docker Compose.
 ```bash
-docker-compose up --build
+docker compose --env-file .env.docker up --build -d
 ```
 
 The app is available at `http://localhost:8080` once all health checks pass.
 
-### Default Admin Account
+**Shut down:**
 
-On first startup, a Flyway migration seeds one admin user. You need it to log in and create any other users or FAQs:
+```bash
+docker compose --env-file .env.docker down
+```
 
-- **Username:** `admin`
-- **Password:** `@Password0`
+</details>
 
 ---
 
-## | Exploring the API
+<details>
+<summary><b>Option 2: Manual</b></summary>
 
-### 1. API Documentation
-**Swagger UI: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)**
+<br>
 
-Authenticate, retrieve a JWT token, and test all endpoints for FAQ and user management in Postman.
+### Option 2: Manual
 
-### 2. Search Demo
-**[http://localhost:8080/search.html](http://localhost:8080/search.html)**
+Configure your databases and update the `application-local.yml` file with your connection credentials and run the application:
 
-Enter keywords and observe the response times and results from PostgreSQL and MongoDB with the Trie index and cached responses.
+<table>
+<tr><td><strong>bash / zsh / sh</strong></td>
+<td>
 
-<img src="src/main/resources/static/images/search.png">
+```bash
+chmod +x ./mvnw
+./mvnw clean package
+java -jar target/faq-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=local
+```
 
-### 3. Test Coverage
-Unit tests cover core business logic, services, and utilities.
+</td></tr>
+<tr><td><strong>PowerShell / cmd</strong></td>
+<td>
 
-<img src="src/main/resources/static/images/tests.png">
+```bash
+.\mvnw.cmd clean package
+java -jar target/faq-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=local
+```
+
+</td></tr>
+</table>
+
+</details>
 
 ---
 
@@ -117,23 +135,22 @@ Unit tests cover core business logic, services, and utilities.
 
 ---
 
-## | Tech Stack
+<details>
+<summary><b>Exploring the API</b></summary>
 
-| Layer | Technology                                                 |
-| :--- |:-----------------------------------------------------------|
-| **Framework** | Spring Boot 3.5.5, Spring Security, Spring Data            |
-| **Language** | Java 21                                                    |
-| **Database** | PostgreSQL 17.5 (primary), MongoDB (document store)        |
-| **Caching** | Redis                                                      |
-| **Search** | PostgreSQL GIN, MongoDB Custom In-Memory Trie              |
-| **Auth** | Basic Auth (login) + JWT (jjwt) for authenticated requests |
-| **API Docs** | Springdoc OpenAPI 2.8.0 (generates OpenAPI 3 spec)         |
-| **Task Scheduling** | ShedLock                                                   |
-| **Database Migration** | Flyway                                                     |
-| **Mapping** | MapStruct                                                  |
-| **Logging** | Logback + Logstash encoder                                 |
-| **Code Quality** | Checkstyle, Lombok                                         |
-| **Packaging** | Docker                                                     |
+### Search Demo
+**[http://localhost:8080/search.html](http://localhost:8080/search.html)**
+
+Enter keywords and observe the response times and results from PostgreSQL and MongoDB with the Trie index and cached responses.
+
+<img src="src/main/resources/static/images/search.png">
+
+### Test Coverage
+Unit tests cover core business logic, services, and utilities.
+
+<img src="src/main/resources/static/images/tests.png">
+
+</details>
 
 ---
 
