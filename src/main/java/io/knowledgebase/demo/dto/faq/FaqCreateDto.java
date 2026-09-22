@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FaqCreateDto {
+public final class FaqCreateDto {
     @NotBlank
     @Size(max = 256)
     private String question;

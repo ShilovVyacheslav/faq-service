@@ -19,7 +19,7 @@ import static io.knowledgebase.demo.common.validation.ValidationPatterns.USERNAM
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRequestDto {
+public final class UserRequestDto {
     @NotBlank
     @Size(min = 2, max = 128)
     @Pattern(regexp = FULLNAME_REGEXP)

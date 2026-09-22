@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FaqResponseDto {
+public final class FaqResponseDto {
     private Long id;
     private String question;
     private String answer;
