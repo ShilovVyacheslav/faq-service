@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserUpdateResponseDto {
+public final class UserUpdateResponseDto {
     private Long id;
     private String fullname;
     private String username;

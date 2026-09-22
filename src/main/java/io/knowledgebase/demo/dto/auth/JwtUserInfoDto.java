@@ -7,7 +7,7 @@ import java.util.Set;
 
 @Data
 @Builder
-public class JwtUserInfoDto {
+public final class JwtUserInfoDto {
     private Long id;
     private Set<String> roles;
 }

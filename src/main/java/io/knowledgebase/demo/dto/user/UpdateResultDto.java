@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateResultDto {
+public final class UpdateResultDto {
     private Integer result;
     private String comment;
 }

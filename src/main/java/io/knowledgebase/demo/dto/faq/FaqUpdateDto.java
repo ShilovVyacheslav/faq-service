@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FaqUpdateDto {
+public final class FaqUpdateDto {
     private String question;
     private String answer;
     private List<String> keywords;

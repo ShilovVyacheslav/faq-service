@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FaqPreviewDto {
+public final class FaqPreviewDto {
     private Long id;
     private String question;
     private List<String> keywords;
