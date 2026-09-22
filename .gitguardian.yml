@@ -1,5 +1,5 @@
 secret:
   ignored_paths:
-    - 'src/main/resources/application-Local.yml'
-    - 'src/main/resources/application-docker.yml'
+    - 'src/main/resources/application-local.yml'
     - 'src/test/resources/application-test.yml'
+    - '.env.example'
